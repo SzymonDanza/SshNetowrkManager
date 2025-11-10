@@ -26,12 +26,62 @@ def exec_ssh_command(ip, username, password, command):
         return f"Błąd podczas wykonywania komendy: {e}"
     
 
-def get_dhcp_info(ip, username, password):
-    
+def get_dhcp_data(ip, username, password):
+    """
+    Pobiera dane o DHCP:
+      - aktywne dzierżawy z /tmp/dhcp.leases
+      - podstawowe ustawienia (start, limit, leasetime)
+      - pełną konfigurację DHCP (opcjonalnie do podglądu)
+    """
     try:
-        less_output = exec_ssh_command(ip, username, password, "cat /tmp/dhcp.leases")
-        
+        # aktywne dzierżawy
+        leases_output = exec_ssh_command(ip, username, password, "cat /tmp/dhcp.leases")
+
+        # aktualne parametry DHCP
+        start = exec_ssh_command(ip, username, password, "uci get dhcp.lan.start").strip()
+        limit = exec_ssh_command(ip, username, password, "uci get dhcp.lan.limit").strip()
+        leasetime = exec_ssh_command(ip, username, password, "uci get dhcp.lan.leasetime").strip()
+
+        # pełna konfiguracja (opcjonalna)
         config_output = exec_ssh_command(ip, username, password, "cat /etc/config/dhcp")
-        return less_output, config_output
+
+        # parsowanie listy klientów
+        leases = []
+        for line in leases_output.splitlines():
+            parts = line.split()
+            if len(parts) >= 4:
+                leases.append({
+                    "timestamp": parts[0],
+                    "mac": parts[1],
+                    "ip": parts[2],
+                    "hostname": parts[3] if len(parts) > 3 else "-"
+                })
+
+        return {
+            "leases": leases,
+            "settings": {"start": start, "limit": limit, "leasetime": leasetime},
+            "config_raw": config_output
+        }
+
     except Exception as e:
-        return f"Błąd podczas pobierania informacji DHCP: {e}"
+        return {
+            "leases": [],
+            "settings": {"start": "-", "limit": "-", "leasetime": "-"},
+            "config_raw": f"Błąd pobierania DHCP: {e}"
+        }
+    
+def update_dhcp_config(ip, username, password, start,limit,leasetime):
+
+    try:
+        commands = [
+        f"uci set dhcp.lan.start='{start}'",
+        f"uci set dhcp.lan.limit='{limit}'",
+        f"uci set dhcp.lan.leasetime='{leasetime}'",
+        "uci commit dhcp",
+        "/etc/init.d/dnsmasq restart"
+        ]
+        full_command = " && ".join(commands)
+        result = exec_ssh_command(ip, username, password, full_command)
+        return True, f"Konfiguracja DHCP została zaktualizowana:\n{result}"
+    except Exception as e:
+        return False, f"Błąd aktualizacji konfiguracji DHCP: {e}"

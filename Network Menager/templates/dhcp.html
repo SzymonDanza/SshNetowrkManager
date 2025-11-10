@@ -21,38 +21,94 @@
             background: #fafafa;
             padding: 10px;
             border-radius: 5px;
+            margin-top: 10px;
+            display: none; /* ukryte domyślnie */
         }
-        a { text-decoration: none; color: blue; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
     </style>
 </head>
 <body>
-    <h1>📜 DHCP - informacje o serwerze</h1>
 
-    <h2>📡 Aktywne dzierżawy:</h2>
-    {% if leases %}
-        <table>
-            <tr>
-                <th>MAC</th>
-                <th>Adres IP</th>
-                <th>Hostname</th>
-                <th>ID klienta</th>
-            </tr>
-            {% for lease in leases %}
-            <tr>
-                <td>{{ lease.mac }}</td>
-                <td>{{ lease.ip }}</td>
-                <td>{{ lease.hostname }}</td>
-                <td>{{ lease.client_id }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+<h1>📡 DHCP – konfiguracja i status</h1>
+
+<h2>⚙️ Ustawienia serwera DHCP</h2>
+<table>
+    <tr><th>Start</th><th>Limit</th><th>Lease Time</th></tr>
+    <tr>
+        <td>{{ data.settings.start }}</td>
+        <td>{{ data.settings.limit }}</td>
+        <td>{{ data.settings.leasetime }}</td>
+    </tr>
+</table>
+
+<h2>🛠️ Edycja ustawień</h2>
+<form method="POST" action="/dhcp">
+    <label>Start adresów:</label><br>
+    <input type="text" name="start" value="{{ data.settings.start }}" required><br><br>
+
+    <label>Liczba adresów:</label><br>
+    <input type="text" name="limit" value="{{ data.settings.limit }}" required><br><br>
+
+    <label>Czas dzierżawy:</label><br>
+    <input type="text" name="leasetime" value="{{ data.settings.leasetime }}" required><br><br>
+
+    <button type="submit">💾 Zapisz zmiany</button>
+</form>
+{% if message %}
+    {% if success %}
+        <div style="background-color:#d4edda; color:#155724; padding:10px; border-radius:5px; margin-top:10px;">
+            {{ message }}
+        </div>
     {% else %}
-        <p>Brak aktywnych dzierżaw DHCP.</p>
+        <div style="background-color:#f8d7da; color:#721c24; padding:10px; border-radius:5px; margin-top:10px;">
+            {{ message }}
+        </div>
     {% endif %}
+{% endif %}
 
-    <h2>⚙️ Konfiguracja serwera DHCP:</h2>
-    <pre>{{ config }}</pre>
 
-    <a href="/dashboard">⬅️ Powrót do menu</a>
+{% if message %}
+    <p><strong>{{ message }}</strong></p>
+{% endif %}
+
+<h2>📋 Aktywne dzierżawy</h2>
+{% if data.leases %}
+    <table>
+        <tr><th>MAC</th><th>IP</th><th>Hostname</th><th>Czas</th></tr>
+        {% for lease in data.leases %}
+        <tr>
+            <td>{{ lease.mac }}</td>
+            <td>{{ lease.ip }}</td>
+            <td>{{ lease.hostname }}</td>
+            <td>{{ lease.timestamp }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>Brak aktywnych klientów DHCP.</p>
+{% endif %}
+
+<!-- Przycisk do pokazania pełnej konfiguracji -->
+<h2>🔍 Zaawansowane</h2>
+<button onclick="toggleConfig()">Pokaż pełną konfigurację DHCP</button>
+<pre id="configBox">{{ data.config_raw }}</pre>
+
+<script>
+function toggleConfig() {
+    const box = document.getElementById("configBox");
+    box.style.display = (box.style.display === "none" || box.style.display === "") ? "block" : "none";
+}
+</script>
+
+<a href="/dashboard">⬅️ Powrót do menu</a>
 </body>
 </html>

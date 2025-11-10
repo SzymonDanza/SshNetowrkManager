@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Status urządzenia</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            text-align: center;
+            background-color: #f2f2f2;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 70%;
+            background: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        th {
+            background-color: #0078D7;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>📡 Status urządzenia</h1>
+
+    {% if status.error %}
+        <p style="color:red;">{{ status.error }}</p>
+    {% else %}
+        <p><b>Uptime:</b> {{ status.uptime }}</p>
+        <p><b>Obciążenie CPU:</b> {{ status.load }}</p>
+        <p><b>Pamięć:</b> {{ status.memory }}</p>
+        <p><b>Bramka domyślna:</b> {{ status.gateway }}</p>
+
+        <h2>🌐 Interfejsy sieciowe</h2>
+        <table>
+            <tr>
+                <th>Nazwa</th>
+                <th>Status</th>
+            </tr>
+            {% for iface in status.interfaces %}
+                <tr>
+                    <td>{{ iface.name }}</td>
+                    {% if iface.state == "UP" %}
+                        <td style="color:green;">🟢 Aktywny</td>
+                    {% else %}
+                        <td style="color:red;">🔴 Wyłączony</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</body>
+</html>

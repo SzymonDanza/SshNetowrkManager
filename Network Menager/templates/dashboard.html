@@ -43,13 +43,13 @@
     </style>
 </head>
 <body>
-    <h1>📡 Network Manager</h1>
+    <h1>Network Manager</h1>
     <p>Zalogowano jako: <b>{{ username }}</b> ({{ ip }})</p>
 
     <!-- Główne menu -->
     <div class="main-menu">
         <div>
-            <button onclick="toggleMenu()">🌐 Network</button>
+            <button onclick="toggleMenu()">Network</button>
             <div id="submenu" class="submenu">
                 <button onclick="window.location.href='/lan'">LAN</button>
                 <button onclick="window.location.href='/wireless'">Wireless</button>
@@ -58,7 +58,8 @@
         </div>
 
         <div>
-            <button onclick="window.location.href='/logs'">🖥️ System</button>
+            <button onclick="window.location.href='/logs'">System</button>
+            <button onclick="window.location.href='/status'">📶 Status urządzenia</button>
         </div>
     </div>
 

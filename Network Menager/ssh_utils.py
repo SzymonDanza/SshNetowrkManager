@@ -7,10 +7,10 @@ def connect_router(ip, username, password):
         ssh.connect(ip, username=username, password=password, port=22, timeout=10)
         ssh.close()
         # ZWRACAMY DOKŁADNIE DWA ELEMENTY!
-        return True, f"✅ Połączono pomyślnie z routerem {ip}"
+        return True, f"Połączono pomyślnie z routerem {ip}"
     except Exception as e:
         # Również DWA ELEMENTY (False + wiadomość)
-        return False, f"❌ Błąd połączenia: {e}"
+        return False, f"Błąd połączenia: {e}"
 
 def exec_ssh_command(ip, username, password, command):
     try:
@@ -94,3 +94,30 @@ def get_system_logs(ip, username, password):
         return logs or "Brak logów systemowych."
     except Exception as e:
         return f"Błąd podczas pobierania logów: {e}"
+    
+
+def get_device_status(ip, username, password):
+    """
+    Pobiera status routera: uptime, CPU load, pamięć, bramę i interfejsy (z informacją o UP/DOWN).
+    """
+    try:
+        raw_ifaces = exec_ssh_command(ip, username, password, "ip -o link show").splitlines()
+        interfaces = []
+
+        for line in raw_ifaces:
+            # Przykładowa linia: 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 ...
+            parts = line.split(": ")
+            if len(parts) > 1:
+                name = parts[1].split(":")[0]
+                state = "UP" if "UP" in parts[1] else "DOWN"
+                interfaces.append({"name": name, "state": state})
+
+        return {
+            "uptime": exec_ssh_command(ip, username, password, "uptime -p").strip(),
+            "load": exec_ssh_command(ip, username, password, "cat /proc/loadavg | awk '{print $1, $2, $3}'").strip(),
+            "memory": exec_ssh_command(ip, username, password, "free -m | awk '/Mem/ {print $3\"/\"$2\" MB\"}'").strip(),
+            "gateway": exec_ssh_command(ip, username, password, "ip route | grep default | awk '{print $3}'").strip(),
+            "interfaces": interfaces
+        }
+    except Exception as e:
+        return {"error": f"❌ Błąd pobierania statusu urządzenia: {e}"}

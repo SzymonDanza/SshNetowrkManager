@@ -38,9 +38,9 @@
 </head>
 <body>
 
-<h1>📡 DHCP – konfiguracja i status</h1>
+<h1>DHCP-konfiguracja i status</h1>
 
-<h2>⚙️ Ustawienia serwera DHCP</h2>
+<h2>Ustawienia serwera DHCP</h2>
 <table>
     <tr><th>Start</th><th>Limit</th><th>Lease Time</th></tr>
     <tr>
@@ -50,7 +50,7 @@
     </tr>
 </table>
 
-<h2>🛠️ Edycja ustawień</h2>
+<h2>Edycja ustawień</h2>
 <form method="POST" action="/dhcp">
     <label>Start adresów:</label><br>
     <input type="text" name="start" value="{{ data.settings.start }}" required><br><br>
@@ -80,7 +80,7 @@
     <p><strong>{{ message }}</strong></p>
 {% endif %}
 
-<h2>📋 Aktywne dzierżawy</h2>
+<h2>Aktywne dzierżawy</h2>
 {% if data.leases %}
     <table>
         <tr><th>MAC</th><th>IP</th><th>Hostname</th><th>Czas</th></tr>
@@ -98,7 +98,7 @@
 {% endif %}
 
 <!-- Przycisk do pokazania pełnej konfiguracji -->
-<h2>🔍 Zaawansowane</h2>
+<h2>Zaawansowane</h2>
 <button onclick="toggleConfig()">Pokaż pełną konfigurację DHCP</button>
 <pre id="configBox">{{ data.config_raw }}</pre>
 
@@ -109,6 +109,6 @@ function toggleConfig() {
 }
 </script>
 
-<a href="/dashboard">⬅️ Powrót do menu</a>
+<a href="/dashboard">Powrót do menu</a>
 </body>
 </html>

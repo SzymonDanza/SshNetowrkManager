@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from ssh_utils import connect_router, exec_ssh_command, get_dhcp_data, update_dhcp_config
+from ssh_utils import connect_router, exec_ssh_command, get_dhcp_data, update_dhcp_config, get_system_logs
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
@@ -70,6 +70,16 @@ def dhcp():
 
     dhcp_data = get_dhcp_data(ip, username, password)
     return render_template("dhcp.html", data=dhcp_data)
+
+
+@app.route("/logs")
+def logs():
+    ip = session.get("ip")
+    username = session.get("username")
+    password = session.get("password")
+
+    logs = get_system_logs(ip, username, password)
+    return render_template("logs.html", logs=logs)
 
 
 if __name__ == "__main__":

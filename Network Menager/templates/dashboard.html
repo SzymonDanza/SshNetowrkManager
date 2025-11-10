@@ -14,10 +14,31 @@
             font-size: 18px;
             margin: 10px;
             cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            background-color: #007bff;
+            color: white;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
         }
         .submenu {
             display: none;
-            margin-top: 20px;
+            margin-top: 15px;
+        }
+        .main-menu {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+        }
+        .submenu button {
+            background-color: #17a2b8;
+        }
+        .submenu button:hover {
+            background-color: #117a8b;
         }
     </style>
 </head>
@@ -25,26 +46,27 @@
     <h1>📡 Network Manager</h1>
     <p>Zalogowano jako: <b>{{ username }}</b> ({{ ip }})</p>
 
-    <div>
-        <button onclick="toggleMenu()">🌐 Network</button>
-    </div>
+    <!-- Główne menu -->
+    <div class="main-menu">
+        <div>
+            <button onclick="toggleMenu()">🌐 Network</button>
+            <div id="submenu" class="submenu">
+                <button onclick="window.location.href='/lan'">LAN</button>
+                <button onclick="window.location.href='/wireless'">Wireless</button>
+                <button onclick="window.location.href='/dhcp'">DHCP</button>
+            </div>
+        </div>
 
-    <div id="submenu" class="submenu">
-        <button onclick="window.location.href='/lan'">LAN</button>
-        <button onclick="window.location.href='/wireless'">Wireless</button>
-        <button onclick="window.location.href='/dhcp'">DHCP</button>
+        <div>
+            <button onclick="window.location.href='/logs'">🖥️ System</button>
+        </div>
     </div>
 
     <script>
-function toggleMenu() {
-    const submenu = document.getElementById("submenu");
-    const current = submenu.style.display;
-    if (current === "" || current === "none") {
-        submenu.style.display = "block";
-    } else {
-        submenu.style.display = "none";
+    function toggleMenu() {
+        const submenu = document.getElementById("submenu");
+        submenu.style.display = (submenu.style.display === "block") ? "none" : "block";
     }
-}
-</script>
+    </script>
 </body>
 </html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Logi systemowe - Network Manager</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; background-color: #f9f9f9; }
+        h1 { text-align: center; }
+        pre {
+            background-color: #111;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 8px;
+            height: 600px;
+            overflow-y: scroll;
+            font-size: 14px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover { background-color: #0056b3; }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Logi systemowe routera</h1>
+
+<pre id="logsBox">{{ logs }}</pre>
+
+<form method="GET" action="/logs">
+    <button type="submit">Odśwież logi</button>
+</form>
+
+<a href="/dashboard">Powrót do menu</a>
+
+</body>
+</html>

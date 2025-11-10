@@ -85,3 +85,12 @@ def update_dhcp_config(ip, username, password, start,limit,leasetime):
         return True, f"Konfiguracja DHCP została zaktualizowana:\n{result}"
     except Exception as e:
         return False, f"Błąd aktualizacji konfiguracji DHCP: {e}"
+    
+def get_system_logs(ip, username, password):
+    try:
+        logs = exec_ssh_command(ip, username, password, "logread | tail -n 200")
+        if "not found" in logs.lower() or logs.strip() == "":
+            logs = exec_ssh_command(ip, username, password, "dmesg | tail -n 200")
+        return logs or "Brak logów systemowych."
+    except Exception as e:
+        return f"Błąd podczas pobierania logów: {e}"

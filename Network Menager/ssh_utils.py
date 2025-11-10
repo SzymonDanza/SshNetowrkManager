@@ -24,3 +24,14 @@ def exec_ssh_command(ip, username, password, command):
         return output or "Brak danych z routera."
     except Exception as e:
         return f"Błąd podczas wykonywania komendy: {e}"
+    
+
+def get_dhcp_info(ip, username, password):
+    
+    try:
+        less_output = exec_ssh_command(ip, username, password, "cat /tmp/dhcp.leases")
+        
+        config_output = exec_ssh_command(ip, username, password, "cat /etc/config/dhcp")
+        return less_output, config_output
+    except Exception as e:
+        return f"Błąd podczas pobierania informacji DHCP: {e}"

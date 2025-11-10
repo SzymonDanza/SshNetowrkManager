@@ -32,13 +32,19 @@
     <div id="submenu" class="submenu">
         <button onclick="window.location.href='/lan'">LAN</button>
         <button onclick="window.location.href='/wireless'">Wireless</button>
+        <button onclick="window.location.href='/dhcp'">DHCP</button>
     </div>
 
     <script>
-        function toggleMenu() {
-            const menu = document.getElementById("submenu");
-            menu.style.display = menu.style.display === "none" ? "block" : "none";
-        }
-    </script>
+function toggleMenu() {
+    const submenu = document.getElementById("submenu");
+    const current = submenu.style.display;
+    if (current === "" || current === "none") {
+        submenu.style.display = "block";
+    } else {
+        submenu.style.display = "none";
+    }
+}
+</script>
 </body>
 </html>

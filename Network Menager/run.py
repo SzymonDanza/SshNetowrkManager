@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, Response, redirect,url_for,session
-from ssh_utils import connect_router, exec_ssh_command
+from ssh_utils import connect_router, exec_ssh_command, get_dhcp_info
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
@@ -51,7 +51,25 @@ def wireless():
     wifi_info = exec_ssh_command(ip, username, password, "iwinfo")
     return render_template("wireless.html", wifi_info=wifi_info)
 
+@app.route("/dhcp")
+def dhcp():
+    ip = session.get("ip")
+    username = session.get("username")
+    password = session.get("password")
+    leases_output, config_output = get_dhcp_info(ip, username, password)
 
+    leases = []
+    for line in leases_output.splitlines():
+        parts = line.split()
+        if len(parts) >= 5:
+            timestamp, mac, ip_addr, hostname, client_id = parts
+            leases.append({
+                "expiry": parts[0],
+                "mac": parts[1],
+                "ip": parts[2],
+                "hostname": parts[3]
+            })
+    return render_template("dhcp.html", leases=leases, config=config_output)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel zarządzania siecią</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 60px;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        .submenu {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📡 Network Manager</h1>
+    <p>Zalogowano jako: <b>{{ username }}</b> ({{ ip }})</p>
+
+    <div>
+        <button onclick="toggleMenu()">🌐 Network</button>
+    </div>
+
+    <div id="submenu" class="submenu">
+        <button onclick="window.location.href='/lan'">LAN</button>
+        <button onclick="window.location.href='/wireless'">Wireless</button>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById("submenu");
+            menu.style.display = menu.style.display === "none" ? "block" : "none";
+        }
+    </script>
+</body>
+</html>

@@ -95,65 +95,95 @@ def get_system_logs(ip, username, password):
         return f"Błąd podczas pobierania logów: {e}"
 
 
-# Pobranie statusu routera: uptime, load, pamięć, brama, interfejsy
+
+import json
 import time
 
 def get_device_status(ip, username, password):
     """
-    Pobiera status routera: uptime, aktualne obciążenie CPU (%), średnie load average,
-    pamięć, bramę oraz status interfejsów sieciowych.
+    Pobiera status routera:
+    - czas działania (uptime)
+    - zużycie CPU (%)
+    - średnie obciążenie (load average)
+    - pamięć RAM
+    - bramę domyślną
+    - interfejsy logiczne (LAN, WAN, itp.)
     """
     try:
-        # Pobranie listy interfejsów
-        raw_ifaces = exec_ssh_command(ip, username, password, "ip -o link show").splitlines()
         interfaces = []
 
-        for line in raw_ifaces:
-            parts = line.split(": ")
-            if len(parts) > 1:
-                name = parts[1].split(":")[0]
-                state = "UP" if "UP" in parts[1] else "DOWN"
-                interfaces.append({"name": name, "state": state})
+        # ======================
+        # 🔹 INTERFEJSY LOGICZNE
+        # ======================
+        uci_interfaces = exec_ssh_command(ip, username, password, "uci show network | grep '=interface' || true").splitlines()
 
-        # Pobranie uptime (czyli jak długo system działa)
-        raw_uptime = exec_ssh_command(ip, username, password, "uptime").strip()
-        uptime_clean = ""
+        for line in uci_interfaces:
+            if "network." in line:
+                iface = line.split(".")[1].split("=")[0]
+                raw_status = exec_ssh_command(ip, username, password, f"ifstatus {iface} || true").strip()
+
+                state = "DOWN"
+                if raw_status:
+                    try:
+                        data = json.loads(raw_status)
+                        if data.get("up") is True:
+                            state = "UP"
+                    except json.JSONDecodeError:
+                        pass
+
+                interfaces.append({"name": iface, "state": state})
+
+        # ======================
+        # 🔹 SYSTEM: UPTIME, CPU, RAM, GATEWAY
+        # ======================
+
+        # 1️⃣ Uptime – wersja kompatybilna z BusyBox
+        raw_uptime = exec_ssh_command(ip, username, password, "uptime || echo 'brak danych'").strip()
+        uptime_clean = "brak danych"
         if "up" in raw_uptime:
-            uptime_clean = raw_uptime.split("up")[-1].split(",")[0].strip()
+    # przykład:  16:27:55 up 1 day,  3:12,  load average: 0.00, 0.01, 0.00
+            try:
+        # Wyciągamy wszystko między "up" a "load average"
+                uptime_clean = raw_uptime.split("up", 1)[1].split("load average")[0].strip().rstrip(",")
+            except Exception:
+                uptime_clean = raw_uptime.strip()
 
-        # Pobranie średniego load average (1,5,15 min)
-        load_avg_raw = exec_ssh_command(ip, username, password, "cat /proc/loadavg").strip()
-        load_avg = " ".join(load_avg_raw.split()[:3]) if load_avg_raw else "Brak danych"
+        # 2️⃣ Load average (średnie obciążenie)
+        load_avg = exec_ssh_command(ip, username, password, "awk '{print $1,$2,$3}' /proc/loadavg || echo 'brak danych'").strip()
 
-        # Pobranie aktualnego obciążenia CPU (%)
-        cpu_stat_1 = exec_ssh_command(ip, username, password, "cat /proc/stat | grep '^cpu '").strip()
-        time.sleep(0.3)  # krótka przerwa 300ms
-        cpu_stat_2 = exec_ssh_command(ip, username, password, "cat /proc/stat | grep '^cpu '").strip()
+        # 3️⃣ CPU usage (%)
+        cpu1 = exec_ssh_command(ip, username, password, "cat /proc/stat | grep '^cpu '").strip()
+        time.sleep(0.3)
+        cpu2 = exec_ssh_command(ip, username, password, "cat /proc/stat | grep '^cpu '").strip()
 
-        def parse_cpu_line(line):
+        def parse_cpu(line):
             parts = line.split()
-            return list(map(int, parts[1:8])) if len(parts) >= 8 else [0]*7
+            return list(map(int, parts[1:])) if len(parts) > 7 else [0] * 7
 
-        cpu1 = parse_cpu_line(cpu_stat_1)
-        cpu2 = parse_cpu_line(cpu_stat_2)
+        c1, c2 = parse_cpu(cpu1), parse_cpu(cpu2)
+        idle1, idle2 = c1[3], c2[3]
+        total1, total2 = sum(c1), sum(c2)
+        diff_total = total2 - total1
+        diff_idle = idle2 - idle1
+        cpu_usage = 0.0
+        if diff_total > 0:
+            cpu_usage = (1 - diff_idle / diff_total) * 100
 
-        idle1, idle2 = cpu1[3], cpu2[3]
-        total1, total2 = sum(cpu1), sum(cpu2)
-        total_diff = total2 - total1
-        idle_diff = idle2 - idle1
-        cpu_usage = 0
-        if total_diff > 0:
-            cpu_usage = (1 - (idle_diff / total_diff)) * 100
+        # 4️⃣ RAM i brama
+        memory = exec_ssh_command(ip, username, password, "free -m | awk '/Mem/ {print $3\"/\"$2\" MB\"}' || echo 'brak danych'").strip()
+        gateway = exec_ssh_command(ip, username, password, "ip route | grep default | awk '{print $3}' || echo '-'").strip()
 
         return {
-            "uptime": uptime_clean or raw_uptime,
+            "uptime": uptime_clean,
             "cpu_usage": f"{cpu_usage:.1f}%",
             "cpu_load": load_avg,
-            "memory": exec_ssh_command(ip, username, password, "free -m | awk '/Mem/ {print $3\"/\"$2\" MB\"}'").strip(),
-            "gateway": exec_ssh_command(ip, username, password, "ip route | grep default | awk '{print $3}'").strip(),
+            "memory": memory,
+            "gateway": gateway,
             "interfaces": interfaces
         }
 
     except Exception as e:
         return {"error": f"❌ Błąd pobierania statusu urządzenia: {e}"}
+
+
 

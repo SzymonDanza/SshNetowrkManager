@@ -1,77 +1,41 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Panel zarządzania siecią</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 60px;
-        }
-        button {
-            padding: 15px 30px;
-            font-size: 18px;
-            margin: 10px;
-            cursor: pointer;
-            border: none;
-            border-radius: 6px;
-            background-color: #007bff;
-            color: white;
-            transition: 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-            transform: scale(1.05);
-        }
-        .submenu {
-            display: none;
-            margin-top: 15px;
-        }
-        .main-menu {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 30px;
-        }
-        .submenu button {
-            background-color: #17a2b8;
-        }
-        .submenu button:hover {
-            background-color: #117a8b;
-        }
-    </style>
-</head>
-<body>
-    <h1>Network Manager</h1>
-    <p>Zalogowano jako: <b>{{ username }}</b> ({{ ip }})</p>
+{% extends "base.html" %}
 
-    <!-- Główne menu -->
-    <div class="main-menu">
-        <div>
-            <button onclick="toggleMenu()">Network</button>
-            <div id="submenu" class="submenu">
-                <button onclick="window.location.href='/lan'">LAN</button>
-                <button onclick="window.location.href='/wireless'">Wireless</button>
-                <button onclick="window.location.href='/dhcp'">DHCP</button>
-                <button onclick="window.location.href='/device'">Device</button>
+{% block title %}Dashboard - Network Manager{% endblock %}
 
-            </div>
-        </div>
+{% block content %}
+<div class="dashboard">
+    <h1>🌐 Network Manager</h1>
+    <p>Witaj, <b>{{ username }}</b>! Jesteś połączony z routerem: <b>{{ ip }}</b></p>
 
-        <div>
-            <button onclick="window.location.href='/logs'">System</button>
-            <button onclick="window.location.href='/status'">📶 Status urządzenia</button>
-            <button onclick="window.location.href='/terminal'">🖥️ Konsola SSH</button>
-
-        </div>
+    <div class="info-box">
+        <p>Wybierz jedną z zakładek w górnym menu, aby zarządzać routerem.</p>
+        <p>Możesz sprawdzić status, logi, konfigurację DHCP, interfejsy sieciowe, 
+        a także otworzyć konsolę SSH, aby wprowadzić własne komendy.</p>
     </div>
+</div>
 
-    <script>
-    function toggleMenu() {
-        const submenu = document.getElementById("submenu");
-        submenu.style.display = (submenu.style.display === "block") ? "none" : "block";
-    }
-    </script>
-</body>
-</html>
+<style>
+.dashboard {
+    text-align: center;
+    padding: 80px 20px;
+}
+.dashboard h1 {
+    font-size: 48px;
+    color: #007bff;
+    margin-bottom: 10px;
+}
+.dashboard p {
+    font-size: 18px;
+    color: #333;
+}
+.info-box {
+    margin-top: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: inline-block;
+    max-width: 600px;
+}
+</style>
+{% endblock %}

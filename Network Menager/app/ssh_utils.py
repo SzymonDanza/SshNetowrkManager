@@ -384,3 +384,7 @@ def update_wifi_config(ip, username, password, interface, ssid=None, key=None, e
 
     except Exception as e:
         return False, f"❌ Błąd podczas aktualizacji Wi-Fi: {e}"
+    
+
+
+

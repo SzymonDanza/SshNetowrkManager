@@ -1,63 +1,87 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Status routera</title>
-    <style>
-        body { font-family: Arial; text-align: center; margin-top: 40px; }
-        table { margin: auto; border-collapse: collapse; width: 60%; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-        th { background-color: #f2f2f2; }
-    </style>
-</head>
-<body>
-    <h1>Status urządzenia</h1>
+{% extends "base.html" %}
 
-    {% if status.error %}
-        <p style="color:red;">{{ status.error }}</p>
-    {% else %}
-        <h2>Informacje o systemie</h2>
-        <p><b>Czas działania:</b> {{ status.uptime }}</p>
-        <p>
-    <b>Obciążenie CPU:</b> {{ status.cpu_usage }}
-    <button onclick="toggleDetails()" style="margin-left:10px;">Szczegóły ⬇️</button>
-</p>
+{% block title %}Status routera - Network Manager{% endblock %}
 
-<div id="cpu-details" style="display:none; margin-top:10px;">
-    <p><b>Średnie obciążenie (1/5/15 min):</b> {{ status.cpu_load }}</p>
-</div>
+{% block content %}
+<h1>📶 Status urządzenia</h1>
+
+{% if status.error %}
+    <p style="color:red;">{{ status.error }}</p>
+{% else %}
+    <h2>Informacje o systemie</h2>
+
+    <p><b>Czas działania:</b> {{ status.uptime }}</p>
+
+    <p>
+        <b>Obciążenie CPU:</b> {{ status.cpu_usage }}
+        <button onclick="toggleDetails()" style="margin-left:10px;">Szczegóły ⬇️</button>
+    </p>
+
+    <div id="cpu-details" style="display:none; margin-top:10px;">
+        <p><b>Średnie obciążenie (1/5/15 min):</b> {{ status.cpu_load }}</p>
+    </div>
+
+    <p><b>Pamięć:</b> {{ status.memory }}</p>
+    <p><b>Brama domyślna:</b> {{ status.gateway }}</p>
+
+    <h2>Interfejsy sieciowe</h2>
+    <table>
+        <tr>
+            <th>Nazwa</th>
+            <th>Status</th>
+        </tr>
+        {% for iface in status.interfaces %}
+        <tr>
+            <td>{{ iface.name }}</td>
+            {% if iface.state == "UP" %}
+                <td style="color:green;">🟢 Aktywny</td>
+            {% else %}
+                <td style="color:red;">🔴 Wyłączony</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+
+<style>
+    h1, h2 {
+        text-align: center;
+        color: #333;
+        margin-top: 30px;
+    }
+    table {
+        margin: 30px auto;
+        border-collapse: collapse;
+        width: 70%;
+        background: white;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    th, td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: center;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button:hover {
+        background-color: #0056b3;
+    }
+</style>
 
 <script>
 function toggleDetails() {
     const details = document.getElementById("cpu-details");
-    if (details.style.display === "none") {
-        details.style.display = "block";
-    } else {
-        details.style.display = "none";
-    }
+    details.style.display = (details.style.display === "none" || details.style.display === "") ? "block" : "none";
 }
 </script>
-
-        <p><b>Pamięć:</b> {{ status.memory }}</p>
-        <p><b>Brama domyślna:</b> {{ status.gateway }}</p>
-
-        <h2>Interfejsy sieciowe</h2>
-        <table>
-            <tr>
-                <th>Nazwa</th>
-                <th>Status</th>
-            </tr>
-            {% for iface in status.interfaces %}
-            <tr>
-                <td>{{ iface.name }}</td>
-                {% if iface.state == "UP" %}
-                    <td style="color:green;">🟢 Aktywny</td>
-                {% else %}
-                    <td style="color:red;">🔴 Wyłączony</td>
-                {% endif %}
-            </tr>
-            {% endfor %}
-        </table>
-    {% endif %}
-</body>
-</html>
+{% endblock %}

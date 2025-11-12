@@ -1,41 +1,8 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Szczegóły interfejsu Wi-Fi</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 40px auto;
-            background-color: #fafafa;
-        }
-        h1 { text-align: center; color: #333; }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-top: 20px;
-            background: white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
-        th { background-color: #f2f2f2; width: 30%; }
-        form { margin-top: 30px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-        input, select { width: 100%; padding: 8px; margin: 6px 0; border-radius: 4px; border: 1px solid #ccc; }
-        button {
-            background: #007bff; color: white; padding: 10px 15px; border: none;
-            border-radius: 5px; cursor: pointer; width: 100%; margin-top: 10px;
-        }
-        button:hover { background: #0056b3; }
-        .message { padding: 10px; border-radius: 6px; margin-top: 15px; }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
-        a { display: inline-block; margin-top: 20px; text-decoration: none; color: white; background: #007bff; padding: 10px 20px; border-radius: 5px; }
-        a:hover { background: #0056b3; }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
 
+{% block title %}Szczegóły interfejsu Wi-Fi – {{ interface }}{% endblock %}
+
+{% block content %}
 <h1>📶 Szczegóły interfejsu Wi-Fi – {{ interface }}</h1>
 
 {% if message %}
@@ -73,7 +40,55 @@
     <button type="submit">💾 Zapisz zmiany</button>
 </form>
 
-<a href="/wireless">⬅️ Powrót do listy interfejsów</a>
-
-</body>
-</html>
+<style>
+    h1, h2 { text-align: center; color: #333; margin-top: 20px; }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 20px;
+        background: white;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    th, td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: left;
+    }
+    th { background-color: #f2f2f2; width: 30%; }
+    form {
+        margin-top: 30px;
+        padding: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    input, select {
+        width: 100%;
+        padding: 8px;
+        margin: 6px 0;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+    button {
+        background: #007bff;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 10px;
+        transition: 0.3s;
+    }
+    button:hover { background: #0056b3; }
+    .message {
+        padding: 10px;
+        border-radius: 6px;
+        margin-top: 15px;
+        text-align: center;
+        font-weight: bold;
+    }
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+</style>
+{% endblock %}

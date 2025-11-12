@@ -1,54 +1,8 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Interfejsy Wi-Fi - OpenWrt</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 950px;
-            margin: 40px auto;
-            background-color: #fafafa;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-top: 20px;
-            background: white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: center;
-        }
-        th { background-color: #f2f2f2; }
-        a.btn {
-            text-decoration: none;
-            padding: 6px 12px;
-            background-color: #007bff;
-            color: white;
-            border-radius: 4px;
-        }
-        a.btn:hover { background-color: #0056b3; }
-        a.back {
-            display: inline-block;
-            margin-top: 20px;
-            text-decoration: none;
-            color: white;
-            background: #007bff;
-            padding: 10px 20px;
-            border-radius: 5px;
-        }
-        a.back:hover { background: #0056b3; }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
 
+{% block title %}Interfejsy Wi-Fi – Network Manager{% endblock %}
+
+{% block content %}
 <h1>📡 Interfejsy Wi-Fi (OpenWrt)</h1>
 
 {% if wifi_info %}
@@ -66,11 +20,11 @@
     {% for wifi in wifi_info %}
     <tr>
         <td>{{ wifi.interface }}</td>
-        <td>{{ wifi.ssid }}</td>
-        <td>{{ wifi.channel }}</td>
-        <td>{{ wifi.frequency }}</td>
-        <td>{{ wifi.txpower }}</td>
-        <td>{{ wifi.encryption }}</td>
+        <td>{{ wifi.ssid or '-' }}</td>
+        <td>{{ wifi.channel or '-' }}</td>
+        <td>{{ wifi.frequency or '-' }}</td>
+        <td>{{ wifi.txpower or '-' }}</td>
+        <td>{{ wifi.encryption or '-' }}</td>
         <td><a href="/wifi/{{ wifi.interface }}" class="btn">Szczegóły</a></td>
     </tr>
     {% endfor %}
@@ -79,7 +33,41 @@
 <p>Brak danych o interfejsach Wi-Fi.</p>
 {% endif %}
 
-<a href="/dashboard" class="back">🔙 Powrót do menu</a>
-
-</body>
-</html>
+<style>
+    h1 {
+        text-align: center;
+        color: #333;
+        margin-top: 30px;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 20px;
+        background: white;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    th, td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: center;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    a.btn {
+        text-decoration: none;
+        padding: 6px 12px;
+        background-color: #007bff;
+        color: white;
+        border-radius: 4px;
+        transition: 0.2s;
+    }
+    a.btn:hover {
+        background-color: #0056b3;
+    }
+    p {
+        text-align: center;
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}

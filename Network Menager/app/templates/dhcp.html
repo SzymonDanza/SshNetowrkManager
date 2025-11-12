@@ -1,44 +1,9 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>DHCP - Network Manager</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; }
-        h1 { text-align: center; }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: center;
-        }
-        th { background: #f4f4f4; }
-        pre {
-            background: #fafafa;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            display: none; /* ukryte domyślnie */
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 5px;
-        }
-        button:hover { background-color: #0056b3; }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h1>DHCP-konfiguracja i status</h1>
+{% block title %}DHCP - Network Manager{% endblock %}
+
+{% block content %}
+<h1>DHCP - konfiguracja i status</h1>
 
 <h2>Ustawienia serwera DHCP</h2>
 <table>
@@ -63,6 +28,7 @@
 
     <button type="submit">💾 Zapisz zmiany</button>
 </form>
+
 {% if message %}
     {% if success %}
         <div style="background-color:#d4edda; color:#155724; padding:10px; border-radius:5px; margin-top:10px;">
@@ -74,9 +40,6 @@
         </div>
     {% endif %}
 {% endif %}
-
-
-
 
 <h2>Aktywne dzierżawy</h2>
 {% if data.leases %}
@@ -95,20 +58,13 @@
     <p>Brak aktywnych klientów DHCP.</p>
 {% endif %}
 
-<!-- Przycisk do pokazania pełnej konfiguracji -->
 <h2>Zaawansowane</h2>
 <button onclick="toggleConfig()">Pokaż pełną konfigurację DHCP</button>
 <pre id="configBox">{{ data.config_raw }}</pre>
 
-<script>
-function toggleConfig() {
-    const box = document.getElementById("configBox");
-    box.style.display = (box.style.display === "none" || box.style.display === "") ? "block" : "none";
-}
-</script>
 <hr>
-<h2>🔒 Rezerwacje DHCP</h2>
 
+<h2>🔒 Rezerwacje DHCP</h2>
 {% if reservations %}
 <table>
     <tr>
@@ -147,7 +103,44 @@ function toggleConfig() {
     <button type="submit" style="background-color:#28a745;">Dodaj</button>
 </form>
 
+<style>
+    h1, h2 { text-align: center; color:#333; }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 20px;
+        background: white;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: center;
+    }
+    th { background: #f4f4f4; }
+    pre {
+        background: #fafafa;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+        display: none;
+    }
+    button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+    }
+    button:hover { background-color: #0056b3; }
+</style>
 
-<a href="/dashboard">Powrót do menu</a>
-</body>
-</html>
+<script>
+function toggleConfig() {
+    const box = document.getElementById("configBox");
+    box.style.display = (box.style.display === "none" || box.style.display === "") ? "block" : "none";
+}
+</script>
+{% endblock %}

@@ -223,4 +223,10 @@ def register_routes(app):
                 output = exec_ssh_command(ip, username, password, command)
 
         return render_template("console.html", command=command, output=output)
+    
+
+    @app.route("/logout")
+    def logout():
+        session.clear()
+        return redirect(url_for("index"))
 

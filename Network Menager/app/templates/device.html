@@ -1,59 +1,89 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Zarządzanie urządzeniem</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
-        table { margin: auto; border-collapse: collapse; width: 60%; }
-        th, td { border: 1px solid #ddd; padding: 8px; }
-        th { background: #f2f2f2; }
-    </style>
-</head>
-<body>
-    <h1>⚙️ Zarządzanie urządzeniem</h1>
+{% extends "base.html" %}
 
-    {% if message %}
-        <p><b>{{ message }}</b></p>
-    {% endif %}
+{% block title %}Zarządzanie urządzeniem - Network Manager{% endblock %}
 
-    <h2>🔁 Restart routera</h2>
-    <form method="POST">
-        <button type="submit" name="action" value="reboot">Restartuj router</button>
-    </form>
+{% block content %}
+<h1>⚙️ Zarządzanie urządzeniem</h1>
 
-    <h2>🌐 Interfejsy sieciowe</h2>
-    <table>
-        <tr>
-            <th>Nazwa interfejsu</th>
-            <th>Status</th>
-            <th>Akcje</th>
-        </tr>
-        {% for iface in interfaces %}
-        <tr>
-            <td>{{ iface.name }}</td>
-            <td>
+{% if message %}
+    <p><b>{{ message }}</b></p>
+{% endif %}
+
+<h2>🔁 Restart routera</h2>
+<form method="POST">
+    <button type="submit" name="action" value="reboot">Restartuj router</button>
+</form>
+
+<h2>🌐 Interfejsy sieciowe</h2>
+<table>
+    <tr>
+        <th>Nazwa interfejsu</th>
+        <th>Status</th>
+        <th>Akcje</th>
+    </tr>
+    {% for iface in interfaces %}
+    <tr>
+        <td>{{ iface.name }}</td>
+        <td>
+            {% if iface.state == "UP" %}
+                🟢 Aktywny
+            {% else %}
+                🔴 Wyłączony
+            {% endif %}
+        </td>
+        <td>
+            <form method="POST" style="display:inline;">
                 {% if iface.state == "UP" %}
-                    🟢 Aktywny
+                    <button type="submit" name="action" value="ifdown_{{ iface.name }}">Wyłącz</button>
                 {% else %}
-                    🔴 Wyłączony
+                    <button type="submit" name="action" value="ifup_{{ iface.name }}">Włącz</button>
                 {% endif %}
-            </td>
-            <td>
-                <form method="POST" style="display:inline;">
-                    {% if iface.state == "UP" %}
-                        <button type="submit" name="action" value="ifdown_{{ iface.name }}">Wyłącz</button>
-                    {% else %}
-                        <button type="submit" name="action" value="ifup_{{ iface.name }}">Włącz</button>
-                    {% endif %}
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
 
-    <br>
-    <a href="/dashboard">⬅️ Powrót do panelu</a>
-</body>
-</html>
+<style>
+    h1 {
+        text-align: center;
+        margin-top: 40px;
+    }
+    h2 {
+        margin-top: 30px;
+        color: #333;
+    }
+    p {
+        color: #007bff;
+        font-weight: bold;
+    }
+    button {
+        padding: 10px 20px;
+        margin: 5px;
+        cursor: pointer;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        transition: 0.3s;
+    }
+    button:hover {
+        background: #0056b3;
+    }
+    table {
+        margin: 30px auto;
+        border-collapse: collapse;
+        width: 70%;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        background: white;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+    }
+    th {
+        background: #f2f2f2;
+    }
+</style>
+{% endblock %}

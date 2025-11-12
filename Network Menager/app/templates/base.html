@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Network Manager{% endblock %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fafafa;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 🔹 Pasek nawigacji */
+        nav {
+            background-color: #007bff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            padding: 10px 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav a, .dropdown-btn {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            transition: 0.3s;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        nav a:hover, .dropdown-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* 🔹 Dropdown menu */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            border-radius: 6px;
+            overflow: hidden;
+            z-index: 2000; /* 🧩 kluczowe: dymek nad innymi elementami */
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 10px 15px;
+            text-decoration: none;
+            display: block;
+            background: white;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f2f2f2;
+        }
+
+        /* 🧩 poprawka: pokazuj menu, gdy jesteśmy nad dropdownem lub jego zawartością */
+        .dropdown:hover .dropdown-content,
+        .dropdown-content:hover {
+            display: block;
+        }
+
+        /* 🔹 Główna zawartość */
+        main {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            z-index: 1;
+            position: relative;
+        }
+
+        /* 🔹 Stopka */
+        footer {
+            text-align: center;
+            font-size: 0.9em;
+            color: #777;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+
+{% if request.path != '/' %}
+    <!-- 🔹 Pasek nawigacji -->
+    <nav>
+        <a href="/dashboard">Dashboard</a>
+
+        <div class="dropdown">
+            <span class="dropdown-btn">Network</span>
+            <div class="dropdown-content">
+                <a href="/lan">LAN</a>
+                <a href="/wireless">Wireless</a>
+                <a href="/dhcp">DHCP</a>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <span class="dropdown-btn">Device</span>
+            <div class="dropdown-content">
+                <a href="/status">Status</a>
+                <a href="/device">Device</a>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <span class="dropdown-btn">System</span>
+            <div class="dropdown-content">
+                <a href="/logs">Logi</a>
+                <a href="/terminal">Konsola</a>
+            </div>
+        </div>
+
+        <div style="margin-left:auto; margin-right:30px;">
+        <a href="/logout" style="
+            background-color:#dc3545;
+            color:white;
+            padding:8px 14px;
+            border-radius:6px;
+            text-decoration:none;
+            font-weight:bold;
+        ">🚪 Wyloguj</a>
+    </div>
+    </nav>
+{% endif %}
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+{% if request.path != '/' %}
+<footer>
+    <p>2025 Network Manager – Projekt Inżynierski</p>
+</footer>
+{% endif %}
+
+</body>
+</html>

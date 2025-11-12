@@ -1,33 +1,68 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Logowanie SSH</title>
-    <style>
-        body { font-family: Arial; max-width: 600px; margin: 50px auto; }
-        input { width: 100%; padding: 8px; margin-bottom: 10px; }
-        button { padding: 10px 20px; }
-        .error { color: red; font-weight: bold; }
-    </style>
-</head>
-<body>
-    <h1>Połącz z routerem</h1>
+{% extends "base.html" %}
 
-    {% if error %}
+{% block title %}Logowanie SSH - Network Manager{% endblock %}
+
+{% block content %}
+<h1>Połącz z routerem</h1>
+
+{% if error %}
     <p class="error">{{ error }}</p>
-    {% endif %}
+{% endif %}
 
-    <form action="/connect" method="POST">
-        <label>Adres IP routera:</label><br>
-        <input type="text" name="ip" placeholder="192.168.1.1" required><br>
+<form action="/connect" method="POST" class="login-form">
+    <label>Adres IP routera:</label><br>
+    <input type="text" name="ip" placeholder="192.168.1.1" required><br>
 
-        <label>Login:</label><br>
-        <input type="text" name="username" placeholder="admin" required><br>
+    <label>Login:</label><br>
+    <input type="text" name="username" placeholder="admin" required><br>
 
-        <label>Hasło:</label><br>
-        <input type="password" name="password" required><br>
+    <label>Hasło:</label><br>
+    <input type="password" name="password" required><br>
 
-        <button type="submit">Połącz</button>
-    </form>
-</body>
-</html>
+    <button type="submit">Połącz</button>
+</form>
+
+<style>
+    h1 {
+        text-align: center;
+        margin-top: 40px;
+        color: #333;
+    }
+    .login-form {
+        max-width: 400px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 15px;
+    }
+    button {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button:hover {
+        background-color: #0056b3;
+    }
+    .error {
+        text-align: center;
+        color: red;
+        font-weight: bold;
+        margin-top: 15px;
+    }
+</style>
+{% endblock %}

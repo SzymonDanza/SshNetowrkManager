@@ -76,9 +76,7 @@
 {% endif %}
 
 
-{% if message %}
-    <p><strong>{{ message }}</strong></p>
-{% endif %}
+
 
 <h2>Aktywne dzierżawy</h2>
 {% if data.leases %}
@@ -108,6 +106,47 @@ function toggleConfig() {
     box.style.display = (box.style.display === "none" || box.style.display === "") ? "block" : "none";
 }
 </script>
+<hr>
+<h2>🔒 Rezerwacje DHCP</h2>
+
+{% if reservations %}
+<table>
+    <tr>
+        <th>MAC</th>
+        <th>IP</th>
+        <th>Nazwa</th>
+        <th>Akcja</th>
+    </tr>
+    {% for r in reservations %}
+    <tr>
+        <td>{{ r.mac }}</td>
+        <td>{{ r.ip }}</td>
+        <td>{{ r.name }}</td>
+        <td>
+            <form method="POST" style="display:inline;">
+                <input type="hidden" name="delete_id" value="{{ r.id }}">
+                <button type="submit" style="background-color:#dc3545;">Usuń</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Brak zdefiniowanych rezerwacji DHCP.</p>
+{% endif %}
+
+<h3>➕ Dodaj nową rezerwację</h3>
+<form method="POST">
+    <input type="hidden" name="add_reservation" value="1">
+    <label>MAC:</label>
+    <input type="text" name="mac" required>
+    <label>IP:</label>
+    <input type="text" name="ipaddr" required>
+    <label>Nazwa:</label>
+    <input type="text" name="name" required>
+    <button type="submit" style="background-color:#28a745;">Dodaj</button>
+</form>
+
 
 <a href="/dashboard">Powrót do menu</a>
 </body>

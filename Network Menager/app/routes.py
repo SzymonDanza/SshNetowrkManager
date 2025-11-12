@@ -2,13 +2,17 @@
 #  Network Manager – trasy Flask
 # ================================================
 from flask import render_template, request, redirect, url_for, session
+import re
 from app.ssh_utils import (
     connect_router,
     exec_ssh_command,
     get_dhcp_data,
     update_dhcp_config,
     get_system_logs,
-    get_device_status
+    get_device_status,
+    get_dhcp_reservations,     
+    add_dhcp_reservation,      
+    remove_dhcp_reservation
 )
 
 def register_routes(app):
@@ -54,34 +58,95 @@ def register_routes(app):
         return render_template("lan.html", lan_info=lan_info)
 
     # Informacje o Wi-Fi
+    @app.route("/wifi/<interface>", methods=["GET", "POST"])
+    def wifi_details(interface):
+        ip = session.get("ip")
+        username = session.get("username")
+        password = session.get("password")
+
+        from app.ssh_utils import get_wifi_details, update_wifi_config
+
+        message = None
+        success = None
+
+        if request.method == "POST":
+            ssid = request.form.get("ssid")
+            key = request.form.get("key")
+            encryption = request.form.get("encryption")
+
+            success, message = update_wifi_config(ip, username, password, interface, ssid, key, encryption)
+
+        details = get_wifi_details(ip, username, password, interface)
+        return render_template("wifi_details.html", interface=interface, details=details, message=message, success=success)
+
     @app.route("/wireless")
     def wireless():
         ip = session.get("ip")
         username = session.get("username")
         password = session.get("password")
-        wifi_info = exec_ssh_command(ip, username, password, "iwinfo")
+
+        from app.ssh_utils import get_wifi_info
+        wifi_info = get_wifi_info(ip, username, password)
+
         return render_template("wireless.html", wifi_info=wifi_info)
 
-    # DHCP – podgląd i edycja ustawień
+
+
     @app.route("/dhcp", methods=["GET", "POST"])
     def dhcp():
         ip = session.get("ip")
         username = session.get("username")
         password = session.get("password")
 
+        message = None
+        success = None
+
+        # 🧩 POST – obsługa formularzy (edycja konfiguracji / dodanie / usunięcie rezerwacji)
         if request.method == "POST":
-            start = request.form.get("start")
-            limit = request.form.get("limit")
-            leasetime = request.form.get("leasetime")
+            # 🔹 Dodanie rezerwacji
+            if "add_reservation" in request.form:
+                mac = request.form.get("mac", "").strip()
+                ipaddr = request.form.get("ipaddr", "").strip()
+                name = request.form.get("name", "").strip()
 
-            # aktualizacja konfiguracji DHCP
-            success, message = update_dhcp_config(ip, username, password, start, limit, leasetime)
-            dhcp_data = get_dhcp_data(ip, username, password)
-            return render_template("dhcp.html", data=dhcp_data, message=message, success=success)
+                # 🔍 Wzorce regex do walidacji
+                mac_pattern = r"^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$"
+                ip_pattern = r"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
 
-        # domyślnie wyświetl dane DHCP
+                if not re.match(mac_pattern, mac):
+                    success = False
+                    message = f"❌ Niepoprawny adres MAC: {mac}"
+                elif not re.match(ip_pattern, ipaddr):
+                    success = False
+                    message = f"❌ Niepoprawny adres IP: {ipaddr}"
+                elif not name:
+                    success = False
+                    message = "❌ Nazwa urządzenia nie może być pusta."
+                else:
+                    # ✅ Jeśli dane poprawne, dodaj rezerwację
+                    success, message = add_dhcp_reservation(ip, username, password, mac, ipaddr, name)
+
+
+            # 🔹 Usunięcie rezerwacji
+            elif "delete_id" in request.form:
+                host_id = request.form.get("delete_id")
+                success, message = remove_dhcp_reservation(ip, username, password, host_id)
+
+            # 🔹 Zmiana ustawień DHCP
+            else:
+                start = request.form.get("start")
+                limit = request.form.get("limit")
+                leasetime = request.form.get("leasetime")
+                success, message = update_dhcp_config(ip, username, password, start, limit, leasetime)
+
+        # 🧩 GET – pobranie danych
         dhcp_data = get_dhcp_data(ip, username, password)
-        return render_template("dhcp.html", data=dhcp_data)
+        reservations = get_dhcp_reservations(ip, username, password)
+
+        return render_template("dhcp.html", data=dhcp_data, reservations=reservations, message=message, success=success)
+
+
+   
 
     # Logi systemowe routera
     @app.route("/logs")
@@ -138,3 +203,24 @@ def register_routes(app):
         interfaces = status_data.get("interfaces", [])
 
         return render_template("device.html", interfaces=interfaces, message=message)
+    # Konsola SSH - wpisz komendę, zobacz wynik
+    @app.route("/terminal", methods=["GET", "POST"])
+    def terminal():
+
+        ip = session.get("ip")
+        username = session.get("username")
+        password = session.get("password")
+
+        output = None
+        command = ""
+
+        if request.method == "POST":
+            command = request.form.get("command", "").strip()
+            if not command:
+                output = "❌ Nie podano komendy."
+            else:
+                # 🔓 Brak blokady – komenda idzie prosto do SSH
+                output = exec_ssh_command(ip, username, password, command)
+
+        return render_template("console.html", command=command, output=output)
+

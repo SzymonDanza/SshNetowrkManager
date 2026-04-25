@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Network Manager{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+{% if request.path != '/' %}
+    <nav>
+        <a href="/dashboard">Dashboard</a>
+
+        <div class="dropdown">
+            <span class="dropdown-btn">Network</span>
+            <div class="dropdown-content">
+                <a href="/lan">LAN</a>
+                <a href="/wireless">Wireless</a>
+                <a href="/dhcp">DHCP</a>
+                <a href="/lte">LTE</a>
+                <a href="/devices">Network Devices</a>
+                <a href="/portforward">Port Forward</a>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <span class="dropdown-btn">Device</span>
+            <div class="dropdown-content">
+                <a href="/status">Status</a>
+                <a href="/device">Device</a>
+                <a href="/hostname">Hostname</a>
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <span class="dropdown-btn">System</span>
+            <div class="dropdown-content">
+                <a href="/logs">Logi</a>
+                <a href="/terminal">Konsola</a>
+            </div>
+        </div>
+
+        <a href="/logout" class="logout-btn">Wyloguj</a>
+    </nav>
+{% endif %}
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+{% if request.path != '/' %}
+<footer>
+    <p>&copy; 2025 Network Manager – Projekt Inżynierski</p>
+</footer>
+{% endif %}
+
+<script>
+// Poprawione działanie dropdown menu
+document.addEventListener('DOMContentLoaded', function() {
+    const dropdowns = document.querySelectorAll('.dropdown');
+    
+    dropdowns.forEach(dropdown => {
+        const btn = dropdown.querySelector('.dropdown-btn');
+        const content = dropdown.querySelector('.dropdown-content');
+        
+        // Toggle dropdown na kliknięcie
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                // Zamknij inne dropdowny
+                dropdowns.forEach(other => {
+                    if (other !== dropdown) {
+                        other.querySelector('.dropdown-content').classList.remove('show');
+                        other.classList.remove('active');
+                    }
+                });
+                
+                // Toggle aktualnego dropdown
+                content.classList.toggle('show');
+                dropdown.classList.toggle('active');
+            });
+        }
+    });
+    
+    // Zamknij dropdown po kliknięciu poza nim
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dropdown')) {
+            dropdowns.forEach(dropdown => {
+                dropdown.querySelector('.dropdown-content').classList.remove('show');
+                dropdown.classList.remove('active');
+            });
+        }
+    });
+    
+    // Zapobiegaj zamykaniu dropdown po kliknięciu w jego zawartość
+    document.querySelectorAll('.dropdown-content').forEach(content => {
+        content.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+    
+    // Dodatkowa obsługa dla urządzeń dotykowych
+    if ('ontouchstart' in window) {
+        dropdowns.forEach(dropdown => {
+            const btn = dropdown.querySelector('.dropdown-btn');
+            const content = dropdown.querySelector('.dropdown-content');
+            
+            if (btn && content) {
+                btn.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    content.classList.toggle('show');
+                    dropdown.classList.toggle('active');
+                });
+            }
+        });
+    }
+});
+</script>
+
+</body>
+</html>

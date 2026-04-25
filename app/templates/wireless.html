@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Interfejsy Wi-Fi – Network Manager{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h1>📡 Interfejsy Wi-Fi (OpenWrt)</h1>
+        <p class="card-subtitle">Zarządzaj interfejsami bezprzewodowymi routera</p>
+    </div>
+
+    {% if wifi_info %}
+        <div class="table-container" style="margin-top: var(--spacing-lg);">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Interfejs</th>
+                        <th>SSID</th>
+                        <th>Kanał</th>
+                        <th>Częstotliwość</th>
+                        <th>Moc TX</th>
+                        <th>Szyfrowanie</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for wifi in wifi_info %}
+                    <tr>
+                        <td><strong>{{ wifi.interface }}</strong></td>
+                        <td>{{ wifi.ssid or '-' }}</td>
+                        <td>{{ wifi.channel or '-' }}</td>
+                        <td>{{ wifi.frequency or '-' }}</td>
+                        <td>{{ wifi.txpower or '-' }}</td>
+                        <td>{{ wifi.encryption or '-' }}</td>
+                        <td>
+                            <a href="/wifi/{{ wifi.interface }}" class="btn btn-primary btn-sm">
+                                Szczegóły
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Brak danych o interfejsach Wi-Fi.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Network Manager{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Network Manager</h1>
+    <p class="welcome-text">
+        Witaj, <strong>{{ username }}</strong>! Jesteś połączony z routerem: 
+        <strong>{{ ip }}</strong>
+    </p>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Informacje</h2>
+        <p class="card-subtitle">Zarządzaj swoim routerem przez interfejs webowy</p>
+    </div>
+    
+    <div class="info-box">
+        <p style="font-size: 1.125rem; margin-bottom: var(--spacing-md);">
+            Wybierz jedną z zakładek w górnym menu, aby zarządzać routerem.
+        </p>
+        <p style="color: var(--text-secondary);">
+            Możesz sprawdzić status, logi, konfigurację DHCP, interfejsy sieciowe, 
+            a także otworzyć konsolę SSH, aby wprowadzić własne komendy.
+        </p>
+    </div>
+
+    <div class="stats-grid" style="margin-top: var(--spacing-xl);">
+        <div class="stat-card">
+            <div class="stat-label">Status połączenia</div>
+            <div class="stat-value">Online</div>
+        </div>
+        <div class="stat-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+            <div class="stat-label">Router IP</div>
+            <div class="stat-value" style="font-size: 1.5rem;">{{ ip }}</div>
+        </div>
+        <div class="stat-card" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+            <div class="stat-label">Użytkownik</div>
+            <div class="stat-value" style="font-size: 1.5rem;">{{ username }}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

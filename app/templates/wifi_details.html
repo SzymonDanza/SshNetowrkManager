@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Szczegóły interfejsu Wi-Fi – {{ interface }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h1>Szczegóły interfejsu Wi-Fi – {{ interface }}</h1>
+        <p class="card-subtitle">Konfiguracja i parametry bezprzewodowe</p>
+    </div>
+
+    {% if message %}
+        <div class="alert {{ 'alert-success' if success else 'alert-error' }}">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    {% if details.Błąd %}
+        <div class="alert alert-error">
+            {{ details.Błąd }}
+        </div>
+    {% else %}
+        <div class="table-container" style="margin-top: var(--spacing-lg);">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parametr</th>
+                        <th>Wartość</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key, value in details.items() %}
+                    <tr>
+                        <td><strong>{{ key }}</strong></td>
+                        <td>{{ value }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+
+<div class="card" style="margin-top: var(--spacing-lg);">
+    <div class="card-header">
+        <h2>Zmień konfigurację Wi-Fi</h2>
+    </div>
+
+    <form method="POST" style="margin-top: var(--spacing-md);">
+        <div class="form-group">
+            <label for="ssid">Nazwa sieci (SSID):</label>
+            <input type="text" id="ssid" name="ssid" placeholder="Nowy SSID">
+        </div>
+
+        <div class="form-group">
+            <label for="key">Hasło:</label>
+            <input type="password" id="key" name="key" placeholder="Nowe hasło">
+        </div>
+
+        <div class="form-group">
+            <label for="encryption">Typ szyfrowania:</label>
+            <select id="encryption" name="encryption">
+                <option value="">(bez zmian)</option>
+                <option value="psk2+ccmp">WPA2-PSK (CCMP)</option>
+                <option value="psk2+tkip">WPA2-PSK (TKIP)</option>
+                <option value="psk-mixed+ccmp">WPA/WPA2 mixed (CCMP)</option>
+                <option value="none">Brak zabezpieczeń</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg">
+            Zapisz zmiany
+        </button>
+    </form>
+</div>
+{% endblock %}

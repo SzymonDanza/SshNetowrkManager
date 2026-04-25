@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <h1>Port Forwarding</h1>
+        <p class="card-subtitle">Zarządzaj przekierowaniami portów</p>
+    </div>
+
+    {% if message %}
+        <div class="alert {{ 'alert-success' if success else 'alert-error' }}">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    <div style="margin-top: var(--spacing-xl);">
+        <h2>Dodaj nową regułę</h2>
+        
+        <form method="POST" style="margin-top: var(--spacing-md);">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-md);">
+                <div class="form-group">
+                    <label for="name">Nazwa reguły:</label>
+                    <input type="text" id="name" name="name" placeholder="np. Web Server" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="ipdest">Adres docelowy (LAN):</label>
+                    <input type="text" id="ipdest" name="ipdest" placeholder="192.168.1.100" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="wanport">Port WAN:</label>
+                    <input type="number" id="wanport" name="wanport" placeholder="8080" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="lanport">Port LAN:</label>
+                    <input type="number" id="lanport" name="lanport" placeholder="80" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="proto">Protokół:</label>
+                    <select id="proto" name="proto" required>
+                        <option value="tcp">TCP</option>
+                        <option value="udp">UDP</option>
+                        <option value="tcpudp">TCP+UDP</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success btn-lg" style="margin-top: var(--spacing-md);">
+                Dodaj regułę
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="card" style="margin-top: var(--spacing-lg);">
+    <div class="card-header">
+        <h2>Istniejące reguły</h2>
+    </div>
+
+    {% if rules %}
+        <div class="table-container" style="margin-top: var(--spacing-md);">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nazwa</th>
+                        <th>IP docelowy</th>
+                        <th>Port WAN</th>
+                        <th>Port LAN</th>
+                        <th>Protokół</th>
+                        <th>Akcja</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in rules %}
+                    <tr>
+                        <td><strong>{{ r.name }}</strong></td>
+                        <td><code style="background: rgba(99, 102, 241, 0.1); padding: 2px 6px; border-radius: 4px;">{{ r.ip }}</code></td>
+                        <td><code style="background: rgba(99, 102, 241, 0.1); padding: 2px 6px; border-radius: 4px;">{{ r.wanport }}</code></td>
+                        <td><code style="background: rgba(99, 102, 241, 0.1); padding: 2px 6px; border-radius: 4px;">{{ r.lanport }}</code></td>
+                        <td>
+                            <span class="status-badge" style="background: rgba(139, 92, 246, 0.1); color: #7c3aed;">
+                                {{ r.proto|upper }}
+                            </span>
+                        </td>
+                        <td>
+                            <form method="POST" style="display:inline;">
+                                <input type="hidden" name="delete_id" value="{{ r.id }}">
+                                <button type="submit" class="btn btn-danger btn-sm" 
+                                        onclick="return confirm('Czy na pewno chcesz usunąć tę regułę?');">
+                                    Usuń
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Brak reguł przekierowania portów.
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

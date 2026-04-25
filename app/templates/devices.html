@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <h1>Urządzenia w sieci (ARP)</h1>
+        <p class="card-subtitle">Lista wszystkich urządzeń wykrytych w sieci</p>
+    </div>
+
+    {% if message %}
+        <div class="alert {{ 'alert-success' if success else 'alert-error' }}">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    {% if devices %}
+        <div class="table-container" style="margin-top: var(--spacing-lg);">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nazwa urządzenia</th>
+                        <th>Adres IP</th>
+                        <th>Adres MAC</th>
+                        <th>Interfejs</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in devices %}
+                    <tr>
+                        <td><strong>{{ d.hostname if d.hostname and d.hostname != '-' else 'brak' }}</strong></td>
+                        <td><code style="background: rgba(99, 102, 241, 0.1); padding: 2px 6px; border-radius: 4px;">{{ d.ip }}</code></td>
+                        <td><code style="background: rgba(99, 102, 241, 0.1); padding: 2px 6px; border-radius: 4px;">{{ d.mac }}</code></td>
+                        <td>{{ d.iface }}</td>
+                        <td>
+                            <form method="POST" style="display:inline;">
+                                <input type="hidden" name="ping_ip" value="{{ d.ip }}">
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    Ping
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info" style="margin-top: var(--spacing-lg);">
+            Brak urządzeń w tablicy ARP.
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

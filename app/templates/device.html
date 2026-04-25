@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Zarządzanie urządzeniem - Network Manager{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h1>Zarządzanie urządzeniem</h1>
+    </div>
+
+    {% if message %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    <div style="margin-top: var(--spacing-xl);">
+        <h2>Restart routera</h2>
+        <form method="POST" style="margin-top: var(--spacing-md);">
+            <button type="submit" name="action" value="reboot" class="btn btn-danger btn-lg" 
+                    onclick="return confirm('Czy na pewno chcesz zrestartować router? To może przerwać połączenie.');">
+                Restartuj router
+            </button>
+        </form>
+        <p class="text-secondary" style="margin-top: var(--spacing-sm);">
+            Uwaga: Restart routera spowoduje przerwanie połączenia SSH.
+        </p>
+    </div>
+
+    <div style="margin-top: var(--spacing-2xl);">
+        <h2>Interfejsy sieciowe</h2>
+        <div class="table-container" style="margin-top: var(--spacing-lg);">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nazwa interfejsu</th>
+                        <th>Status</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for iface in interfaces %}
+                    <tr>
+                        <td><strong>{{ iface.name }}</strong></td>
+                        <td>
+                            {% if iface.state == "UP" %}
+                                <span class="status-badge status-online">Aktywny</span>
+                            {% else %}
+                                <span class="status-badge status-offline">Wyłączony</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="POST" style="display:inline;">
+                                {% if iface.state == "UP" %}
+                                    <button type="submit" name="action" value="ifdown_{{ iface.name }}" 
+                                            class="btn btn-danger btn-sm">
+                                        Wyłącz
+                                    </button>
+                                {% else %}
+                                    <button type="submit" name="action" value="ifup_{{ iface.name }}" 
+                                            class="btn btn-success btn-sm">
+                                        Włącz
+                                    </button>
+                                {% endif %}
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

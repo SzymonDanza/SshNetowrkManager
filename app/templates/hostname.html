@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <h1>Zmiana nazwy hosta</h1>
+        <p class="card-subtitle">Zmień nazwę hosta routera</p>
+    </div>
+
+    <div style="margin-top: var(--spacing-xl);">
+        <div class="stat-card" style="margin-bottom: var(--spacing-xl);">
+            <div class="stat-label">Aktualna nazwa hosta</div>
+            <div class="stat-value" style="font-size: 2rem;">{{ current_hostname }}</div>
+        </div>
+
+        {% if message %}
+            <div class="alert {{ 'alert-success' if success else 'alert-error' }}">
+                {{ message }}
+            </div>
+        {% endif %}
+
+        <form method="POST">
+            <div class="form-group">
+                <label for="hostname">Nowa nazwa hosta:</label>
+                <input type="text" id="hostname" name="hostname" 
+                       placeholder="{{ current_hostname }}"
+                       value="{{ current_hostname }}"
+                       required>
+                <p class="text-secondary" style="margin-top: var(--spacing-xs); font-size: 0.875rem;">
+                    Nazwa może zawierać tylko litery, cyfry i myślniki (maks. 32 znaki)
+                </p>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg">
+                Zmień nazwę
+            </button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

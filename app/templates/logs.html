@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Logi systemowe - Network Manager{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h1>Logi systemowe routera</h1>
+        <p class="card-subtitle">Przeglądaj logi systemowe routera w czasie rzeczywistym</p>
+    </div>
+
+    <form method="GET" action="/logs" style="margin-bottom: var(--spacing-lg);">
+        <button type="submit" class="btn btn-primary">
+            Odśwież logi
+        </button>
+    </form>
+
+    <div class="console-output" id="logsBox">{{ logs }}</div>
+</div>
+
+<script>
+    // Auto-scroll to bottom on load
+    window.addEventListener('load', function() {
+        const logsBox = document.getElementById('logsBox');
+        if (logsBox) {
+            logsBox.scrollTop = logsBox.scrollHeight;
+        }
+    });
+</script>
+{% endblock %}

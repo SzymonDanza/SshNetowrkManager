@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <h1>LAN – Konfiguracja i status</h1>
+        <p class="card-subtitle">Zarządzaj konfiguracją sieci lokalnej</p>
+    </div>
+
+    {% if message %}
+        <div class="alert {{ 'alert-success' if success else 'alert-error' }}">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    <div style="margin-top: var(--spacing-xl);">
+        <h2>Aktualna konfiguracja LAN</h2>
+        
+        <form method="POST" style="margin-top: var(--spacing-md);">
+            <div class="form-group">
+                <label for="ipaddr">Adres IP:</label>
+                <input type="text" id="ipaddr" name="ipaddr" value="{{ lan_config.ipaddr }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="netmask">Maska podsieci:</label>
+                <input type="text" id="netmask" name="netmask" value="{{ lan_config.netmask }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="gateway">Brama domyślna:</label>
+                <input type="text" id="gateway" name="gateway" value="{{ lan_config.gateway }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="dns">DNS:</label>
+                <input type="text" id="dns" name="dns" value="{{ lan_config.dns }}" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg">
+                Zapisz zmiany
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="card" style="margin-top: var(--spacing-lg);">
+    <div class="card-header">
+        <h2>Porty LAN / WAN</h2>
+        <p class="card-subtitle">Status i informacje o portach fizycznych</p>
+    </div>
+
+    {% if lan_ports %}
+        <div class="table-container" style="margin-top: var(--spacing-md);">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Port</th>
+                        <th>Opis</th>
+                        <th>Status</th>
+                        <th>Prędkość</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for port in lan_ports %}
+                    <tr>
+                        <td><strong>{{ port.id }}</strong></td>
+                        <td>{{ port.desc }}</td>
+                        <td>
+                            {% if 'up' in port.status.lower() or 'connected' in port.status.lower() %}
+                                <span class="status-badge status-online">{{ port.status }}</span>
+                            {% else %}
+                                <span class="status-badge status-offline">{{ port.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ port.speed }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Brak danych o portach LAN/WAN.
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

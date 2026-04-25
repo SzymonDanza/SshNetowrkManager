@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Konsola SSH - Network Manager{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h1>Konsola SSH</h1>
+        <p class="card-subtitle">Wykonuj komendy bezpośrednio na routerze</p>
+    </div>
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="command"><b>Wpisz komendę (wykona się na routerze):</b></label>
+            <textarea id="command" name="command" class="command-input" 
+                      placeholder="np. uci show wireless; iwinfo; logread | tail -n 100">{{ command }}</textarea>
+        </div>
+
+        <div class="btn-group">
+            <button type="button" class="btn btn-secondary btn-sm" 
+                    onclick="document.getElementById('command').value='iwinfo';">
+                iwinfo
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" 
+                    onclick="document.getElementById('command').value='uci show wireless';">
+                uci show wireless
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" 
+                    onclick="document.getElementById('command').value='logread | tail -n 200';">
+                logread (200)
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" 
+                    onclick="document.getElementById('command').value='ifconfig';">
+                ifconfig
+            </button>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg" style="margin-top: var(--spacing-md);">
+            Wykonaj komendę
+        </button>
+    </form>
+
+    <div class="alert alert-warning" style="margin-top: var(--spacing-xl);">
+        <strong>Uwaga:</strong> Komendy wykonujesz na routerze przez SSH. Unikaj poleceń zmieniających konfigurację, 
+        jeżeli nie jesteś pewny skutków. Niektóre polecenia mogą przerwać połączenie SSH.
+    </div>
+
+    <div style="margin-top: var(--spacing-xl);">
+        <h3>Wynik komendy:</h3>
+        <div class="console-output" id="outputBox">
+            {% if output %}
+                {{ output }}
+            {% else %}
+                Brak wyjścia. Wykonaj komendę, aby zobaczyć wynik.
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

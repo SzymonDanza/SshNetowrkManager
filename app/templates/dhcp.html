@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}DHCP - Network Manager{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h1>DHCP - Konfiguracja i status</h1>
+        <p class="card-subtitle">Zarządzaj serwerem DHCP i rezerwacjami adresów IP</p>
+    </div>
+
+    {% if message %}
+        <div class="alert {{ 'alert-success' if success else 'alert-error' }}">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    <div style="margin-top: var(--spacing-xl);">
+        <h2>Ustawienia serwera DHCP</h2>
+        
+        <div class="stats-grid" style="margin-top: var(--spacing-lg);">
+            <div class="stat-card">
+                <div class="stat-label">Start adresów</div>
+                <div class="stat-value" style="font-size: 1.5rem;">{{ data.settings.start }}</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                <div class="stat-label">Limit adresów</div>
+                <div class="stat-value" style="font-size: 1.5rem;">{{ data.settings.limit }}</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                <div class="stat-label">Czas dzierżawy</div>
+                <div class="stat-value" style="font-size: 1.5rem;">{{ data.settings.leasetime }}</div>
+            </div>
+        </div>
+
+        <div style="margin-top: var(--spacing-xl);">
+            <h3>Edycja ustawień</h3>
+            <form method="POST" action="/dhcp" style="margin-top: var(--spacing-md);">
+                <div class="form-group">
+                    <label for="start">Start adresów:</label>
+                    <input type="text" id="start" name="start" value="{{ data.settings.start }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="limit">Liczba adresów:</label>
+                    <input type="text" id="limit" name="limit" value="{{ data.settings.limit }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="leasetime">Czas dzierżawy:</label>
+                    <input type="text" id="leasetime" name="leasetime" value="{{ data.settings.leasetime }}" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg">
+                    Zapisz zmiany
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="card" style="margin-top: var(--spacing-lg);">
+    <div class="card-header">
+        <h2>Aktywne dzierżawy DHCP</h2>
+    </div>
+
+    {% if data.leases %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>MAC</th>
+                        <th>IP</th>
+                        <th>Hostname</th>
+                        <th>Czas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lease in data.leases %}
+                    <tr>
+                        <td><code style="background: rgba(99, 102, 241, 0.1); padding: 2px 6px; border-radius: 4px;">{{ lease.mac }}</code></td>
+                        <td><code style="background: rgba(99, 102, 241, 0.1); padding: 2px 6px; border-radius: 4px;">{{ lease.ip }}</code></td>
+                        <td><strong>{{ lease.hostname or '-' }}</strong></td>
+                        <td>{{ lease.timestamp }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Brak aktywnych klientów DHCP.
+        </div>
+    {% endif %}
+</div>
+
+<div class="card" style="margin-top: var(--spacing-lg);">
+    <div class="card-header">
+        <h2>Rezerwacje DHCP</h2>
+        <p class="card-subtitle">Przypisz stałe adresy IP do urządzeń</p>
+    </div>
+
+    {% if reservations %}
+        <div class="table-container" style="margin-top: var(--spacing-md);">
+            <table>
+                <thead>
+                    <tr>
+                        <th>MAC</th>
+                        <th>IP</th>
+                        <th>Nazwa</th>
+                        <th>Akcja</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reservations %}
+                    <tr>
+                        <td><code style="background: rgba(99, 102, 241, 0.1); padding: 2px 6px; border-radius: 4px;">{{ r.mac }}</code></td>
+                        <td><code style="background: rgba(99, 102, 241, 0.1); padding: 2px 6px; border-radius: 4px;">{{ r.ip }}</code></td>
+                        <td><strong>{{ r.name }}</strong></td>
+                        <td>
+                            <form method="POST" style="display:inline;">
+                                <input type="hidden" name="delete_id" value="{{ r.id }}">
+                                <button type="submit" class="btn btn-danger btn-sm" 
+                                        onclick="return confirm('Czy na pewno chcesz usunąć tę rezerwację?');">
+                                    Usuń
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Brak zdefiniowanych rezerwacji DHCP.
+        </div>
+    {% endif %}
+
+    <div style="margin-top: var(--spacing-xl); border-top: 2px solid var(--border-color); padding-top: var(--spacing-lg);">
+        <h3>Dodaj nową rezerwację</h3>
+        <form method="POST" style="margin-top: var(--spacing-md);">
+            <input type="hidden" name="add_reservation" value="1">
+            
+            <div class="form-group">
+                <label for="mac">Adres MAC (format: XX:XX:XX:XX:XX:XX):</label>
+                <input type="text" id="mac" name="mac" placeholder="00:11:22:33:44:55" required>
+            </div>
+
+            <div class="form-group">
+                <label for="ipaddr">Adres IP:</label>
+                <input type="text" id="ipaddr" name="ipaddr" placeholder="192.168.1.100" required>
+            </div>
+
+            <div class="form-group">
+                <label for="name">Nazwa urządzenia:</label>
+                <input type="text" id="name" name="name" placeholder="Laptop Jana" required>
+            </div>
+
+            <button type="submit" class="btn btn-success btn-lg">
+                Dodaj rezerwację
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="card" style="margin-top: var(--spacing-lg);">
+    <div class="card-header">
+        <h2>Zaawansowane</h2>
+    </div>
+    <button onclick="toggleConfig()" class="btn btn-secondary">
+        Pokaż pełną konfigurację DHCP
+    </button>
+    <pre id="configBox" style="background: var(--bg-dark); color: #10ff88; padding: var(--spacing-lg); border-radius: var(--radius-md); margin-top: var(--spacing-md); font-family: 'Courier New', monospace; overflow-x: auto; display: none; white-space: pre-wrap;">{{ data.config_raw }}</pre>
+</div>
+
+<script>
+function toggleConfig() {
+    const box = document.getElementById("configBox");
+    const btn = event.target;
+    if (box.style.display === "none" || box.style.display === "") {
+        box.style.display = "block";
+        btn.innerHTML = "Ukryj pełną konfigurację DHCP";
+    } else {
+        box.style.display = "none";
+        btn.innerHTML = "Pokaż pełną konfigurację DHCP";
+    }
+}
+</script>
+{% endblock %}

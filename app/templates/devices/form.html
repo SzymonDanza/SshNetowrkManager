@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edytuj' if device else 'Nowe urządzenie' }}{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>{{ 'Edytuj urządzenie' if device else 'Dodaj urządzenie' }}</h2>
+    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+    <form method="POST">
+        <label>Nazwa</label>
+        <input type="text" name="name" value="{{ device.name if device else '' }}" required>
+
+        <label>Host (IP lub hostname)</label>
+        <input type="text" name="host" value="{{ device.host if device else '' }}" required>
+
+        <label>Użytkownik SSH</label>
+        <input type="text" name="ssh_user" value="{{ device.ssh_user if device else 'root' }}" required>
+
+        <label>Hasło SSH{% if device %} (zostaw puste żeby nie zmieniać){% endif %}</label>
+        <input type="password" name="password" {% if not device %}required{% endif %}>
+
+        <label>Model (opcjonalnie)</label>
+        <input type="text" name="model" value="{{ device.model if device else '' }}">
+
+        <label>Lokalizacja (opcjonalnie)</label>
+        <input type="text" name="location" value="{{ device.location if device else '' }}">
+
+        <button type="submit">{{ 'Zapisz zmiany' if device else 'Dodaj' }}</button>
+        <a href="{{ url_for('devices.device_list') }}">Anuluj</a>
+    </form>
+</div>
+{% endblock %}

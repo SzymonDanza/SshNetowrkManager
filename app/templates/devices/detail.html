@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ device.name }}{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>{{ device.name }}</h2>
+    <p><strong>Host:</strong> {{ device.host }}</p>
+    <p><strong>Użytkownik SSH:</strong> {{ device.ssh_user }}</p>
+    <p><strong>Model:</strong> {{ device.model or '-' }}</p>
+    <p><strong>Lokalizacja:</strong> {{ device.location or '-' }}</p>
+    <p><strong>Status:</strong> <span class="status-{{ device.status }}">{{ device.status }}</span></p>
+
+    <h3>Operacje</h3>
+    <ul>
+        <li><a href="#">Status</a></li>
+        <li><a href="#">DHCP</a></li>
+        <li><a href="#">WiFi</a></li>
+        <li><a href="#">LAN</a></li>
+        <li><a href="#">Port Forwarding</a></li>
+        <li><a href="#">LTE</a></li>
+        <li><a href="#">Logi</a></li>
+        <li><a href="#">Konsola</a></li>
+    </ul>
+
+    <a href="{{ url_for('devices.device_list') }}">← Wróć do listy</a>
+</div>
+{% endblock %}

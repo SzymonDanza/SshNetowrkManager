@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Urządzenia{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Urządzenia</h2>
+    <a href="{{ url_for('devices.device_new') }}" class="btn">+ Dodaj urządzenie</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Nazwa</th>
+                <th>Host</th>
+                <th>Model</th>
+                <th>Lokalizacja</th>
+                <th>Status</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for device in devices %}
+            <tr>
+                <td>{{ device.name }}</td>
+                <td>{{ device.host }}</td>
+                <td>{{ device.model or '-' }}</td>
+                <td>{{ device.location or '-' }}</td>
+                <td><span class="status-{{ device.status }}">{{ device.status }}</span></td>
+                <td>
+                    <a href="{{ url_for('devices.device_detail', device_id=device.id) }}">Zarządzaj</a>
+                    <a href="{{ url_for('devices.device_edit', device_id=device.id) }}">Edytuj</a>
+                    <form method="POST" action="{{ url_for('devices.device_delete', device_id=device.id) }}" style="display:inline">
+                        <button type="submit" onclick="return confirm('Usunąć urządzenie?')">Usuń</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="6">Brak urządzeń. Dodaj pierwszy router.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

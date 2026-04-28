@@ -11,14 +11,17 @@
 
     <h3>Operacje</h3>
     <ul>
-        <li><a href="#">Status</a></li>
-        <li><a href="#">DHCP</a></li>
-        <li><a href="#">WiFi</a></li>
-        <li><a href="#">LAN</a></li>
-        <li><a href="#">Port Forwarding</a></li>
-        <li><a href="#">LTE</a></li>
-        <li><a href="#">Logi</a></li>
-        <li><a href="#">Konsola</a></li>
+        <li><a href="{{ url_for('router.status', device_id=device.id) }}">Status</a></li>
+        <li><a href="{{ url_for('router.dhcp', device_id=device.id) }}">DHCP</a></li>
+        <li><a href="{{ url_for('router.wireless', device_id=device.id) }}">WiFi</a></li>
+        <li><a href="{{ url_for('router.lan', device_id=device.id) }}">LAN</a></li>
+        <li><a href="{{ url_for('router.portforward', device_id=device.id) }}">Port Forwarding</a></li>
+        <li><a href="{{ url_for('router.lte_view', device_id=device.id) }}">LTE</a></li>
+        <li><a href="{{ url_for('router.logs', device_id=device.id) }}">Logi</a></li>
+        <li><a href="{{ url_for('router.terminal', device_id=device.id) }}">Konsola</a></li>
+        <li><a href="{{ url_for('router.connected_devices', device_id=device.id) }}">Podłączone urządzenia</a></li>
+        <li><a href="{{ url_for('router.hostname', device_id=device.id) }}">Hostname</a></li>
+        <li><a href="{{ url_for('router.device', device_id=device.id) }}">Zarządzanie interfejsami</a></li>
     </ul>
 
     <a href="{{ url_for('devices.device_list') }}">← Wróć do listy</a>

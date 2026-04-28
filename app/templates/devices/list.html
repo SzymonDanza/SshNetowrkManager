@@ -24,7 +24,8 @@
                 <td>{{ device.location or '-' }}</td>
                 <td><span class="status-{{ device.status }}">{{ device.status }}</span></td>
                 <td>
-                    <a href="{{ url_for('devices.device_detail', device_id=device.id) }}">Zarządzaj</a>
+                    <a href="{{ url_for('router.dashboard', device_id=device.id) }}">Zarządzaj</a>
+
                     <a href="{{ url_for('devices.device_edit', device_id=device.id) }}">Edytuj</a>
                     <form method="POST" action="{{ url_for('devices.device_delete', device_id=device.id) }}" style="display:inline">
                         <button type="submit" onclick="return confirm('Usunąć urządzenie?')">Usuń</button>

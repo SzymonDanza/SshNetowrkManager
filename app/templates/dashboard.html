@@ -6,39 +6,38 @@
 <div class="dashboard-header">
     <h1>Network Manager</h1>
     <p class="welcome-text">
-        Witaj, <strong>{{ username }}</strong>! Jesteś połączony z routerem: 
-        <strong>{{ ip }}</strong>
+        Router: <strong>{{ device.name }}</strong> &mdash; <strong>{{ device.host }}</strong>
     </p>
 </div>
 
 <div class="card">
     <div class="card-header">
         <h2 class="card-title">Informacje</h2>
-        <p class="card-subtitle">Zarządzaj swoim routerem przez interfejs webowy</p>
+        <p class="card-subtitle">Zarządzaj routerem przez interfejs webowy</p>
     </div>
-    
+
     <div class="info-box">
         <p style="font-size: 1.125rem; margin-bottom: var(--spacing-md);">
             Wybierz jedną z zakładek w górnym menu, aby zarządzać routerem.
         </p>
         <p style="color: var(--text-secondary);">
-            Możesz sprawdzić status, logi, konfigurację DHCP, interfejsy sieciowe, 
+            Możesz sprawdzić status, logi, konfigurację DHCP, interfejsy sieciowe,
             a także otworzyć konsolę SSH, aby wprowadzić własne komendy.
         </p>
     </div>
 
     <div class="stats-grid" style="margin-top: var(--spacing-xl);">
         <div class="stat-card">
-            <div class="stat-label">Status połączenia</div>
-            <div class="stat-value">Online</div>
+            <div class="stat-label">Status</div>
+            <div class="stat-value">{{ device.status }}</div>
         </div>
         <div class="stat-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
             <div class="stat-label">Router IP</div>
-            <div class="stat-value" style="font-size: 1.5rem;">{{ ip }}</div>
+            <div class="stat-value" style="font-size: 1.5rem;">{{ device.host }}</div>
         </div>
         <div class="stat-card" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
-            <div class="stat-label">Użytkownik</div>
-            <div class="stat-value" style="font-size: 1.5rem;">{{ username }}</div>
+            <div class="stat-label">Użytkownik SSH</div>
+            <div class="stat-value" style="font-size: 1.5rem;">{{ device.ssh_user }}</div>
         </div>
     </div>
 </div>

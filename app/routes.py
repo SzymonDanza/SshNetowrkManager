@@ -34,7 +34,8 @@ def register_routes(app):
     # -----------------------------------------
     @app.route("/")
     def index():
-        return render_template("index.html")
+        return redirect(url_for("auth.login"))
+
 
     @app.route("/connect", methods=["POST"])
     def connect():
@@ -57,9 +58,7 @@ def register_routes(app):
     # -----------------------------------------
     @app.route("/dashboard")
     def dashboard():
-        ip = session.get("ip")
-        username = session.get("username")
-        return render_template("dashboard.html", ip=ip, username=username)
+        return redirect(url_for("devices.device_list"))
 
     # -----------------------------------------
     # WIFI – szczegóły interfejsu

@@ -2,6 +2,7 @@ import paramiko
 import json
 import time
 import re
+import shlex
 
 # Nawiązanie połączenia SSH z routerem
 def connect_router(ip, username, password):
@@ -76,9 +77,9 @@ def get_dhcp_data(ip, username, password):
 def update_dhcp_config(ip, username, password, start, limit, leasetime):
     try:
         commands = [
-            f"uci set dhcp.lan.start='{start}'",
-            f"uci set dhcp.lan.limit='{limit}'",
-            f"uci set dhcp.lan.leasetime='{leasetime}'",
+            f"uci set dhcp.lan.start={shlex.quote(start)}",
+            f"uci set dhcp.lan.limit={shlex.quote(limit)}",
+            f"uci set dhcp.lan.leasetime={shlex.quote(leasetime)}",
             "uci commit dhcp",
             "/etc/init.d/dnsmasq restart"
         ]
@@ -126,12 +127,12 @@ def add_dhcp_reservation(ip, username, password, mac, ipaddr, name):
         #Dodaje nowa sekcje i pola uzupelniam
         cmd = (
             "uci add dhcp host && "
-            f"uci set dhcp.@host[-1].mac='{mac}' && "
-            f"uci set dhcp.@host[-1].ip='{ipaddr}' && "
-            f"uci set dhcp.@host[-1].name='{name}' && "
+            f"uci set dhcp.@host[-1].mac={shlex.quote(mac)} && "
+            f"uci set dhcp.@host[-1].ip={shlex.quote(ipaddr)} && "
+            f"uci set dhcp.@host[-1].name={shlex.quote(name)} && "
             "uci commit dhcp && "
             "/etc/init.d/dnsmasq restart"
-        )
+)
 
         exec_ssh_command(ip, username, password, cmd)
         return True, f"Rezerwacja dla {mac} → {ipaddr} została dodana."
@@ -333,15 +334,16 @@ def update_wifi_config(ip, username, password, interface, ssid=None, key=None, e
 
         commands = []
         if ssid:
-            commands.append(f"uci set {section_name}.ssid='{ssid}'")
+            commands.append(f"uci set {section_name}.ssid={shlex.quote(ssid)}")
         if key:
-            commands.append(f"uci set {section_name}.key='{key}'")
+            commands.append(f"uci set {section_name}.key={shlex.quote(key)}")
         if encryption:
-            commands.append(f"uci set {section_name}.encryption='{encryption}'")
+            commands.append(f"uci set {section_name}.encryption={shlex.quote(encryption)}")
 
         # Zapis i restart Wi-Fi
         commands.append("uci commit wireless")
-        commands.append("wifi reload")
+        commands.append("wifi reload && sleep 3")
+
 
         full_command = " && ".join(commands)
         result = exec_ssh_command(ip, username, password, full_command)
@@ -433,10 +435,11 @@ def get_lte_info(ip, username, password):
 def set_hostname(ip, username, password, new_hostname):
     try:
         cmd = (
-            f"uci set system.@system[0].hostname='{new_hostname}' && "
+            f"uci set system.@system[0].hostname={shlex.quote(new_hostname)} && "
             "uci commit system && "
             "/etc/init.d/system restart"
-        )
+)
+
         exec_ssh_command(ip, username, password, cmd)
         return True, f"Nazwa hosta została zmieniona na: {new_hostname}"
     except Exception as e:
@@ -476,13 +479,14 @@ def get_lan_config(ip, username, password):
 def set_lan_config(ip, username, password, ipaddr, netmask, gateway, dns):
     try:
         cmd = (
-            f"uci set network.lan.ipaddr='{ipaddr}' && "
-            f"uci set network.lan.netmask='{netmask}' && "
-            f"uci set network.lan.gateway='{gateway}' && "
-            f"uci set network.lan.dns='{dns}' && "
+            f"uci set network.lan.ipaddr={shlex.quote(ipaddr)} && "
+            f"uci set network.lan.netmask={shlex.quote(netmask)} && "
+            f"uci set network.lan.gateway={shlex.quote(gateway)} && "
+            f"uci set network.lan.dns={shlex.quote(dns)} && "
             "uci commit network && "
             "/etc/init.d/network restart"
-        )
+)
+
         exec_ssh_command(ip, username, password, cmd)
         return True, "Konfiguracja LAN została zaktualizowana."
     except Exception as e:
@@ -698,15 +702,16 @@ def add_port_forwarding(ip, username, password, name, ipdest, wanport, lanport, 
     """
     cmd = (
         "uci add firewall redirect && "
-        f"uci set firewall.@redirect[-1].name='{name}' && "
+        f"uci set firewall.@redirect[-1].name={shlex.quote(name)} && "
         "uci set firewall.@redirect[-1].src='wan' && "
-        f"uci set firewall.@redirect[-1].src_dport='{wanport}' && "
-        f"uci set firewall.@redirect[-1].dest_ip='{ipdest}' && "
-        f"uci set firewall.@redirect[-1].dest_port='{lanport}' && "
-        f"uci set firewall.@redirect[-1].proto='{proto}' && "
+        f"uci set firewall.@redirect[-1].src_dport={shlex.quote(wanport)} && "
+        f"uci set firewall.@redirect[-1].dest_ip={shlex.quote(ipdest)} && "
+        f"uci set firewall.@redirect[-1].dest_port={shlex.quote(lanport)} && "
+        f"uci set firewall.@redirect[-1].proto={shlex.quote(proto)} && "
         "uci commit firewall && "
         "/etc/init.d/firewall restart"
-    )
+)
+
 
     exec_ssh_command(ip, username, password, cmd)
     return True, "Reguła została dodana."

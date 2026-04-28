@@ -33,7 +33,7 @@
                         <td>{{ wifi.txpower or '-' }}</td>
                         <td>{{ wifi.encryption or '-' }}</td>
                         <td>
-                            <a href="/wifi/{{ wifi.interface }}" class="btn btn-primary btn-sm">
+                            <a href="{{ url_for('router.wifi_details', device_id=device.id, interface=wifi.interface) }}" class="btn btn-primary btn-sm">
                                 Szczegóły
                             </a>
                         </td>

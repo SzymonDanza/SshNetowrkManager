@@ -8,40 +8,44 @@
 </head>
 <body>
 
-{% if request.path != '/' %}
+{% if request.path != '/' and not request.path.startswith('/login') and not request.path.startswith('/register') %}
     <nav>
-        <a href="/dashboard">Dashboard</a>
+        <a href="{{ url_for('devices.device_list') }}">Urządzenia</a>
+
+        {% if device is defined and device %}
+        <span class="nav-device">{{ device.name }}</span>
 
         <div class="dropdown">
             <span class="dropdown-btn">Network</span>
             <div class="dropdown-content">
-                <a href="/lan">LAN</a>
-                <a href="/wireless">Wireless</a>
-                <a href="/dhcp">DHCP</a>
-                <a href="/lte">LTE</a>
-                <a href="/devices">Network Devices</a>
-                <a href="/portforward">Port Forward</a>
+                <a href="{{ url_for('router.lan', device_id=device.id) }}">LAN</a>
+                <a href="{{ url_for('router.wireless', device_id=device.id) }}">Wireless</a>
+                <a href="{{ url_for('router.dhcp', device_id=device.id) }}">DHCP</a>
+                <a href="{{ url_for('router.lte_view', device_id=device.id) }}">LTE</a>
+                <a href="{{ url_for('router.connected_devices', device_id=device.id) }}">Network Devices</a>
+                <a href="{{ url_for('router.portforward', device_id=device.id) }}">Port Forward</a>
             </div>
         </div>
 
         <div class="dropdown">
             <span class="dropdown-btn">Device</span>
             <div class="dropdown-content">
-                <a href="/status">Status</a>
-                <a href="/device">Device</a>
-                <a href="/hostname">Hostname</a>
+                <a href="{{ url_for('router.status', device_id=device.id) }}">Status</a>
+                <a href="{{ url_for('router.device', device_id=device.id) }}">Device</a>
+                <a href="{{ url_for('router.hostname', device_id=device.id) }}">Hostname</a>
             </div>
         </div>
 
         <div class="dropdown">
             <span class="dropdown-btn">System</span>
             <div class="dropdown-content">
-                <a href="/logs">Logi</a>
-                <a href="/terminal">Konsola</a>
+                <a href="{{ url_for('router.logs', device_id=device.id) }}">Logi</a>
+                <a href="{{ url_for('router.terminal', device_id=device.id) }}">Konsola</a>
             </div>
         </div>
+        {% endif %}
 
-        <a href="/logout" class="logout-btn">Wyloguj</a>
+        <a href="{{ url_for('auth.logout') }}" class="logout-btn">Wyloguj</a>
     </nav>
 {% endif %}
 

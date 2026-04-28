@@ -12,4 +12,5 @@ class Base(DeclarativeBase):
 def get_engine():
     return create_engine(os.environ["DATABASE_URL"])
 
-SessionLocal = sessionmaker()
+def SessionLocal():
+    return sessionmaker(bind=get_engine())()

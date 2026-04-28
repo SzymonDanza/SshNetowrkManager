@@ -1,10 +1,13 @@
 from datetime import datetime
 from sqlalchemy import String, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
+from flask_login import UserMixin
+
 from app.db.base import Base
 
 
-class User(Base):
+class User(Base, UserMixin):
+
     """Użytkownik aplikacji — administrator lub operator."""
 
     __tablename__ = "users"
